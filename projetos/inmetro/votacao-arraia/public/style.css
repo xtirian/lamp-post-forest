@@ -1,0 +1,49 @@
+::root{
+	--text-color:#422918;
+	--bg-color1:#FCD9A4;
+}
+
+* {
+  margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+html {
+  width: 100%;
+  overflow: hidden;  
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #FCD9A4;
+  font-size: 18px;
+  color: #422918;
+  letter-spacing: -0.72px;    
+  width: 100%;
+  overflow: hidden;  
+  margin: 0;
+  padding: 0;
+  font-family: margem
+}
+
+/* Container principal com largura fixa mobile */
+.mobile-wrapper {
+  width: 100%;
+  max-width: 480px; /* ou 375px para iPhone padrão */
+  margin: 0 auto;
+  box-sizing: border-box;
+ 
+}
+
+
+
+

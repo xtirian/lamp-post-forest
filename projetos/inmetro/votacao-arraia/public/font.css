@@ -1,0 +1,19 @@
+/* Regular */
+@font-face {
+  font-family: 'margem-rounded';
+  src: url('./fonts/MARGEMROUNDED-REGULAR.TTF') format('truetype');
+  font-weight: 400; /* normal */
+  font-style: normal;
+}
+
+/* Bold */
+@font-face {
+  font-family: 'margem-rounded';
+  src: url('./fonts/MARGEMROUNDED-BOLD.TTF') format('truetype');
+  font-weight: 700; /* bold */
+  font-style: normal;
+}
+
+body {
+  font-family: 'margem-rounded', sans-serif;
+}
