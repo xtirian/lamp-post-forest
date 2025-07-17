@@ -19,7 +19,7 @@ class CustomButton extends HTMLElement {
           align-items:center;
           background-color: #FFE6C2;
           border: 3px solid #422918;
-          border-radius: 100%;
+          border-radius: 40px;
           cursor: pointer;
           transition: background 0.3s ease;
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -27,14 +27,14 @@ class CustomButton extends HTMLElement {
           height:80px;
         }
 
-        button:hover {
+        button:active {
           background-color: #422918;
         }
       </style>
     `;
 
-    const votar = `<button class="votar"><img src="../assets/images/votar.svg" alt="Ícone Votar" /></button>`;
-    const salvar = `<button class="salvar"><img src="../assets/images/salvar.svg" alt="Ícone Votar" /></button>`;
+    const votar = `<button id="customBtn" class="votar"><img src="./public/images/votar.svg" alt="Ícone Votar" /></button>`;
+    const salvar = `<button class="salvar"><img src="./public/images/salvar.svg" alt="Ícone Votar" /></button>`;
 
     const template = `
       <div class="container">
@@ -43,6 +43,21 @@ class CustomButton extends HTMLElement {
     `;
 
     this.shadowRoot.innerHTML = style + template;
+  }
+
+  /**
+   * @param {() => void} callback
+   */
+  set action(callback) {
+    const btn = this.shadowRoot.querySelector('#customBtn');
+    if (!btn || typeof callback !== 'function') return;
+
+    if (this._boundAction) {
+      btn.removeEventListener('click', this._boundAction);
+    }
+
+    this._boundAction = callback;
+    btn.addEventListener('click', this._boundAction);
   }
 }
 

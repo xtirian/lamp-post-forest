@@ -1,8 +1,8 @@
-
 class Root extends HTMLElement {
     constructor(){
         super();
         this.attachShadow({mode:'open'});
+        this.step = 0;
     }
 
     connectedCallback(){
@@ -57,7 +57,9 @@ class Root extends HTMLElement {
                     position:absolute;
                     bottom:-4%;
                     left:50%;
-                    transform:translatex(-50%);                    
+                    transform:translatex(-50%);    
+                    min-width: 120%;     
+                    z-index: 999;           
                 }
             </style>
         `;
@@ -66,15 +68,54 @@ class Root extends HTMLElement {
             <div class="container">
                 <img class="background_img nuvem_direita" src="./public/images/nuvem_direita.svg" alt="nuvem direita"/>
                 <img class="background_img nuvem_esquerda" src="./public/images/nuvem_esquerda.svg" alt="nuvem esquerda"/>
-                <slot>
-                  <!-- ROOT: don't use this part -->
-                </slot>
                 <img class="background_img base_img" src="./public/images/base.svg" alt="base"/>
+                    <div id="navigation-root">
+                        <!-- ROOT NAVIGATION -->
+                    </div>                    
             </div>
         `;
 
         this.shadowRoot.innerHTML = style + template;
+
+        this.stepContainer = this.shadowRoot.querySelector('#navigation-root');
+        this.renderStep();
     }
+
+    renderStep() {
+        this.stepContainer.innerHTML = '';
+        let component;
+        console.log(this.step)
+        switch (this.step) {
+        case 0:
+            component = document.createElement('splash-screen');            
+            setTimeout(() => this.nextStep(), 3000);
+            break;
+        case 1:
+            component = document.createElement('home-page');
+            break;
+        case 2:
+            component = document.createElement('form-step');
+            break;
+        case 3:
+            component = document.createElement('confirmation-step');
+            break;
+        default:
+            component = document.createElement('splash-screen');
+        }
+
+        this.stepContainer.appendChild(component);
+    }
+
+    nextStep() {
+        this.step++;
+        this.renderStep();
+    }
+
+    goToStep(n) {
+        this.step = n;
+        this.renderStep();
+    }
+
 }
 
 customElements.define('root-voting', Root);
