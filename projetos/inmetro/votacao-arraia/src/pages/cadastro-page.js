@@ -25,7 +25,7 @@ class CadastroPage extends HTMLElement {
                 flex-direction: column;
             }
             .img_splash{
-                width: 540px;
+                height: 33vh;
                 margin-bottom:5vh;
             }      
                 
@@ -92,7 +92,7 @@ class CadastroPage extends HTMLElement {
         <div class="home mobile-wrapper">
             <div class="container">
                 <img class="img_splash" src="./public/images/splash.svg" alt="" />
-                
+                    <span style="font-size:12px; color: #CC3C2F; font-weight: 700; ">*Não será possível votar na sua barraca</span>                    
                     <input type="email" placeholder="E-mail" id="email-input" />              
                     <select id="up-input">
                         <option value="" disabled selected>Área / UP</option>
@@ -127,7 +127,7 @@ class CadastroPage extends HTMLElement {
                 if (Object.hasOwnProperty.call(cadastros, key)) {
                     const cadastro = cadastros[key];
                     if (cadastro.email && cadastro.email.toLowerCase() === email.toLowerCase()) {
-                        return true;                         
+                        return cadastro;                         
                     }
                 }
             }
@@ -153,7 +153,9 @@ class CadastroPage extends HTMLElement {
             const jaCadastrado = await this._verificarCadastro(email);
             if (jaCadastrado) {
                 console.warn("Email já cadastrado:", email);
-                return { success: false, message: "Email já cadastrado." };
+                this.localStorage.cadastrar(jaCadastrado.email, jaCadastrado.area);
+                this.nextPage(3);
+                return { success: true, message: "Email já cadastrado." };
             }
 
             const novoCadastro = {
@@ -167,6 +169,8 @@ class CadastroPage extends HTMLElement {
             await push(cadastroRef, novoCadastro);
 
             this.localStorage.cadastrar(email, area);
+
+            this.nextPage(3);
 
             return { success: true, message: "Cadastro realizado com sucesso." };
         } catch (error) {
