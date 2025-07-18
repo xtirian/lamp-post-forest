@@ -50,7 +50,6 @@ class CustomButton extends HTMLElement {
    */
   set action(callback) {
     const btn = this.shadowRoot.querySelector('#customBtn');
-    console.log(callback)
     if (!btn || typeof callback !== 'function') return;
 
     if (this._boundAction) {
