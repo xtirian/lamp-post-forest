@@ -34,7 +34,7 @@ class CustomButton extends HTMLElement {
     `;
 
     const votar = `<button id="customBtn" class="votar"><img src="./public/images/votar.svg" alt="Ícone Votar" /></button>`;
-    const salvar = `<button class="salvar"><img src="./public/images/salvar.svg" alt="Ícone Votar" /></button>`;
+    const salvar = `<button id="customBtn" class="salvar"><img src="./public/images/salvar.svg" alt="Ícone Votar" /></button>`;
 
     const template = `
       <div class="container">
@@ -50,6 +50,7 @@ class CustomButton extends HTMLElement {
    */
   set action(callback) {
     const btn = this.shadowRoot.querySelector('#customBtn');
+    console.log(callback)
     if (!btn || typeof callback !== 'function') return;
 
     if (this._boundAction) {

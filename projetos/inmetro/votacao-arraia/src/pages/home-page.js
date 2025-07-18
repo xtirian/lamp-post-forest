@@ -43,7 +43,7 @@ class HomePage extends HTMLElement {
         </div>
         `;
 
-        this.shadowRoot.innerHTML = style + template;  
+        this.shadowRoot.innerHTML = style + template;
 
         this.setButtonAction()
     }
