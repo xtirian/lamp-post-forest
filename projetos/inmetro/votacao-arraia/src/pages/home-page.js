@@ -44,13 +44,12 @@ class HomePage extends HTMLElement {
         `;
 
         this.shadowRoot.innerHTML = style + template;  
-              
+
         this.setButtonAction()
     }
 
     nextPage(targetPage){
         const root = this.getRootNode().host;
-        console.log('ping')
         root.goToStep(parseInt(targetPage));
     }
 
@@ -60,7 +59,6 @@ class HomePage extends HTMLElement {
             btn.action = () => this.nextPage(2);
         }
     }
-
 }
 
 customElements.define('home-page', HomePage);
