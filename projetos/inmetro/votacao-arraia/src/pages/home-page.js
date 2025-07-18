@@ -18,7 +18,7 @@ class HomePage extends HTMLElement {
                 flex-direction: column;
             }
             .img_splash{
-                width: 540px;
+                height: 33vh;
                 margin-bottom:10vh;
             }            
 

@@ -55,10 +55,11 @@ class Root extends HTMLElement {
 
                 .base_img{
                     position:absolute;
-                    bottom:-4%;
+                    bottom:-1%;                    
                     left:50%;
                     transform:translatex(-50%);    
                     min-width: 120%;     
+                    max-width: 160%;                    
                     z-index: 999;           
                 }
             </style>
@@ -84,7 +85,6 @@ class Root extends HTMLElement {
     renderStep() {
         this.stepContainer.innerHTML = '';
         let component;
-        console.log(this.step)
         switch (this.step) {
         case 0:
             component = document.createElement('splash-screen');            
@@ -94,11 +94,11 @@ class Root extends HTMLElement {
             component = document.createElement('home-page');
             break;
         case 2:
-            component = document.createElement('form-step');
-            break;
+            component = document.createElement('cadastro-page');
+            break;        
         case 3:
-            component = document.createElement('confirmation-step');
-            break;
+            component = document.createElement('votacao-page');
+            break;        
         default:
             component = document.createElement('splash-screen');
         }
