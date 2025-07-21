@@ -1,0 +1,267 @@
+import { database } from '../firebaseConfig.js'; 
+import { ref, push, get, child } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+import LocalStorage from '../functions/localstorage.js'
+
+class VotacaoPage extends HTMLElement {
+    constructor(){
+        super();
+        this.attachShadow({mode:'open'});       
+        this.step = 3; 
+        this.localStorage = new LocalStorage('secao')
+        this.secao = this.localStorage.getSecao();
+    }
+
+    connectedCallback() {
+        this._verificarSessao();
+
+        const style = `<style>
+            .home {
+                margin-top:2.5vh;
+                animation: open 2s ease-out;
+            }
+            .container{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                height:calc(100vh - 175px );
+            }
+
+            .img_splash{
+                width: 200px;
+                margin-bottom:5vh;
+            }      
+
+            .votacao-container {
+                display: flex;
+                flex-wrap:wrap;
+                gap: 1rem;
+                justify-content: center;
+                align-items:center;
+                width:100%;
+            }
+                
+            .opcao-voto {
+                cursor: pointer;
+                overflow: hidden;
+                transition: border 0.2s ease;
+                width:47.5%;
+                position: relative;
+            }
+            .opcao-voto img {
+                border-radius: 10px;
+                width: 100%;
+                height: 100%;
+                min-height:112px;
+                display: block;
+                object-fit:cover;
+                filter: grayscale(80%);
+            }
+
+            .opcao-voto span{
+                bottom:0;
+                left:0;
+                padding-bottom: 8px;
+                padding-left: 8px;
+                width:100%;
+                font-size: 1.4rem;
+                color: white;
+                font-weight: bold;
+                font-family: 'xilosa'
+            }
+
+            input[type="radio"]:checked + .opcao-voto span{
+                color: #FCD9A4;
+                background-color: #42291855;
+            }
+            
+            input[type="radio"] {
+                display: none;
+            }
+
+            input[type="radio"]:checked + .opcao-voto img {
+                filter: grayscale(0%);
+            }
+
+            @keyframes open {
+                0% {
+                    opacity:0;
+                }
+                100% {
+                    opacity:1;
+                }
+            }
+
+            #feedback{
+                display: none;
+                flex-direction:column;
+                align-items: center;
+                justify-content:center;  
+                width:100%;     
+                color: #FFFFFF         
+            }
+
+            .spinner {
+                border: 8px solid #FFFFFF;
+                border-top: 8px solid #422918;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s ease-out infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+        `;
+
+        const reis = [
+            {
+                nome: "Leandro",
+                area: "Gabin",
+                img: "./public/images/sul.jpg"
+            },
+            {
+                nome: "Matheus",
+                area: "Cgcom",
+                img: "./public/images/sudeste.jpg"
+            },
+            {
+                nome: "Renato",
+                area: "Dconf",
+                img: "./public/images/centrooeste.webp"
+            },    
+            {
+                nome: "Francis",
+                area: "Dplan",
+                img: "./public/images/centrooeste.webp"
+            },         
+        ];
+
+        
+
+        const template = `
+            <div class="home mobile-wrapper">
+                <div class="container">
+
+                    <div class="votacao-container" id="votacao-container">
+                        ${reis
+                            .map(v => `
+                                <input type="radio" name="voto" id="${v.nome}" value="${v.nome}" />
+                                <label for="${v.nome}" class="opcao-voto" >
+                                    <img src="${v.img}" alt="Opção ${v.nome}" />
+                                    <span>${v.nome} - ${v.area}</span>
+                                </label>
+                            `).join('')}
+                    </div>
+
+                    
+                    <div id="feedback" style="margin-top: 20px; gap: 8px;">
+                        <div id="spinner" class="spinner"></div>
+                        <img id="checkmark" src="./public/images/verifica.png" alt="Sucesso" style="display:none; width:60px; height:60px;" />
+                        <span id="feedback-text" style="font-weight:bold; color:#FFFFFF;">Enviando...</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.shadowRoot.innerHTML = style + template;  
+
+        const radios = this.shadowRoot.querySelectorAll('input[name="voto"]');
+
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if(confirm(`Seu voto será confirmado para o Rei: ${e.target.value}. Deseja confirmar?
+                    `)){
+                    this._submitVoto(e.target.value)
+                }
+            });
+        });
+
+
+        this.setButtonAction()
+    }
+
+    async _verificarSessao(){
+        if(!this.localStorage.getSecao()){            
+            this.nextPage(1)
+        }
+
+        const votacaoSnap = await get(child(ref(database), 'rei'));
+
+        if(!votacaoSnap.exists()) return false;
+
+        const votos = votacaoSnap.val();
+
+        for (const key in votos) {
+            if(Object.hasOwnProperty.call(votos, key)) {
+                const voto = votos[key];
+                if(voto.key && voto.key === this.secao.key){
+                    if(confirm(`Você já votou. Deseja votar novamente?`)){
+                        this.localStorage.limparCadastro();
+                        this.nextPage(2);
+                    } else{
+                        this.nextPage(1);
+                    }
+                }
+            }
+        }
+    }
+
+    async _submitVoto(voto) {
+        try {
+            const votacaoSnap = await get(child(ref(database), 'rei'));
+
+            const votos = votacaoSnap.val();
+
+            for (const key in votos) {
+                if(Object.hasOwnProperty.call(votos, key)) {
+                    const voto = votos[key];
+                    if(this.secao.rei){
+                        this.nextPage(3);
+                        return { success: false, message: "Este usuário já votou"};
+                    }
+                }
+            }
+
+            const novoCadastro = {
+                criadoEm: Date.now(),
+                key: this.secao.key,
+                voto,
+            };
+
+            const cadastroRef = ref(database, 'rei');
+
+            await push(cadastroRef, novoCadastro);
+
+            this.localStorage.computarVotoRei();
+
+            this.nextPage(3)
+
+            return { success: true, message: "Cadastro realizado com sucesso." };
+        } catch (error) {
+            spinner.style.display = 'none';
+            checkmark.style.display = 'none';
+            feedbackText.textContent = 'Erro ao realizar cadastro.';
+            console.error("Erro ao submeter cadastro:", error);
+            return { success: false, message: "Erro ao realizar cadastro." };
+        }
+    }
+
+    setButtonAction() {
+        const btn = this.shadowRoot.querySelector('custom-button');
+        if (btn) {
+            btn.action = () => this._submitVoto();
+        }
+    }
+
+    nextPage(targetPage){
+        const root = this.getRootNode().host;
+        root.goToStep(parseInt(targetPage));
+    }
+    
+}
+
+customElements.define('votacao-rei', VotacaoPage);
