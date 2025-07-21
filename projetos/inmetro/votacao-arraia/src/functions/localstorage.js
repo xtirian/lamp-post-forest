@@ -46,6 +46,24 @@ class LocalStorage {
   limparCadastro() {
     localStorage.removeItem(this.storageKey);
   }
+
+
+
+  getSecao() {
+    const data = localStorage.getItem(this.storageKey);
+    console.log(data)
+    return data ? JSON.parse(data) : null;
+  }
+  
+  iniciarSecao(key) {
+    if (this.getSecao()) {
+      return false; // já existe
+    }
+
+    const secao = {key}
+
+    localStorage.setItem(this.storageKey, JSON.stringify(secao))
+  }
 }
 
 export default LocalStorage;

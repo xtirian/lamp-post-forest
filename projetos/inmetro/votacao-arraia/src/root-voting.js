@@ -83,8 +83,11 @@ class Root extends HTMLElement {
     }
 
     renderStep() {
-        this.stepContainer.innerHTML = '';
+        this.stepContainer.innerHTML = '';        
         let component;
+        if(!this.checkDevice()){
+            this.step = 4
+        }
         switch (this.step) {
         case 0:
             component = document.createElement('splash-screen');            
@@ -94,11 +97,14 @@ class Root extends HTMLElement {
             component = document.createElement('home-page');
             break;
         case 2:
-            component = document.createElement('cadastro-page');
+            component = document.createElement('votacao-page');
             break;        
         case 3:
             component = document.createElement('votacao-page');
-            break;        
+            break;      
+        case 4:
+            component = document.createElement('only-mobile');
+            break;     
         default:
             component = document.createElement('splash-screen');
         }
@@ -114,6 +120,14 @@ class Root extends HTMLElement {
     goToStep(n) {
         this.step = n;
         this.renderStep();
+    }
+
+    checkDevice(){
+       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+        const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+
+        return isMobile;
     }
 
 }

@@ -7,8 +7,8 @@ class VotacaoPage extends HTMLElement {
         super();
         this.attachShadow({mode:'open'});       
         this.step = 3; 
-        this.localStorage = new LocalStorage('cadastro')
-        this.cadastro = JSON.parse(localStorage.getItem('cadastro'));
+        this.localStorage = new LocalStorage('secao')
+        this.secao = this.localStorage.getSecao();
     }
 
     connectedCallback() {
@@ -146,13 +146,6 @@ class VotacaoPage extends HTMLElement {
 
         
 
-        const areaUsuario = this.cadastro?.area?.toLowerCase();
-
-        const regiaoUsuario = regioes.find(r =>
-            r.areas.some(area => area.toLowerCase() === areaUsuario)
-            )?.regiao;
-
-
         const template = `
             <div class="home mobile-wrapper">
                 <div class="container">
@@ -160,7 +153,6 @@ class VotacaoPage extends HTMLElement {
 
                     <div class="votacao-container" id="votacao-container">
                         ${regioes
-                            .filter(v => v.regiao !== regiaoUsuario)
                             .map(v => `
                                 <input type="radio" name="voto" id="${v.regiao}" value="${v.regiao}" />
                                 <label for="${v.regiao}" class="opcao-voto" >
@@ -198,7 +190,7 @@ class VotacaoPage extends HTMLElement {
     }
 
     async _verificarSessao(){
-        if(!this.localStorage.existeCadastro()){            
+        if(!this.localStorage.getSecao()){            
             this.nextPage(1)
         }
 
@@ -211,8 +203,8 @@ class VotacaoPage extends HTMLElement {
         for (const key in votos) {
             if(Object.hasOwnProperty.call(votos, key)) {
                 const voto = votos[key];
-                if(voto.email && voto.email.toLowerCase() === this.cadastro.email.toLowerCase()){
-                    if(confirm(`Você já votou com o e-mail: ${this.cadastro.email}. Deseja votar com outro e-mail`)){
+                if(voto.key && voto.key === this.secao.key){
+                    if(confirm(`Você já votou. Deseja votar novamente?`)){
                         this.localStorage.limparCadastro();
                         this.nextPage(2);
                     } else{
@@ -244,16 +236,16 @@ class VotacaoPage extends HTMLElement {
             for (const key in votos) {
                 if(Object.hasOwnProperty.call(votos, key)) {
                     const voto = votos[key];
-                    if(voto.email && voto.email.toLowerCase() === this.cadastro.email.toLowerCase()){
-                        alert("Este usuário já possui um cadastro.")
-                        return { success: false, message: "Este usuário já possui um cadastro."};
+                    if(voto.key && voto.key === this.secao.key){
+                        alert("Este usuário já votou.")
+                        return { success: false, message: "Este usuário já votou"};
                     }
                 }
             }
 
             const novoCadastro = {
                 criadoEm: Date.now(),
-                email: this.cadastro.email,
+                key: this.secao.key,
                 voto,
             };
 
@@ -264,8 +256,6 @@ class VotacaoPage extends HTMLElement {
             spinner.style.display = 'none';
             checkmark.style.display = 'block';
             feedbackText.textContent = 'Voto salvo com sucesso!';
-
-            this.localStorage.limparCadastro();
 
             return { success: true, message: "Cadastro realizado com sucesso." };
         } catch (error) {

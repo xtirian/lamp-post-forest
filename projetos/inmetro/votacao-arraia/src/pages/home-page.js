@@ -1,8 +1,14 @@
+import UUID from '../functions/generateUUID.js';
+import LocalStorage from '../functions/localstorage.js';
+
 class HomePage extends HTMLElement {
     constructor(){
         super();
         this.attachShadow({mode:'open'});       
         this.step = 0; 
+        
+        this.geradorSecao = new UUID();
+        this.localStorage = new LocalStorage('secao');
     }
 
     connectedCallback() {
@@ -46,12 +52,21 @@ class HomePage extends HTMLElement {
         this.shadowRoot.innerHTML = style + template;
 
         this.setButtonAction()
+        this.newSesion()
     }
 
     nextPage(targetPage){
         const root = this.getRootNode().host;
         root.goToStep(parseInt(targetPage));
     }
+
+    newSesion(){
+        const secao = this.geradorSecao.generateUUID();
+        this.localStorage.iniciarSecao(secao)
+        return 0
+    }
+
+    
 
     setButtonAction() {
         const btn = this.shadowRoot.querySelector('custom-button');
