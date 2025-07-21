@@ -51,19 +51,26 @@ class LocalStorage {
 
   getSecao() {
     const data = localStorage.getItem(this.storageKey);
-    console.log(data)
     return data ? JSON.parse(data) : null;
   }
   
   iniciarSecao(key) {
-    if (this.getSecao()) {
+    if (!!this.getSecao().secao) {
       return false; // já existe
     }
 
-    const secao = {key}
+    const secao = {key, votou: false}
 
     localStorage.setItem(this.storageKey, JSON.stringify(secao))
   }
+
+  computarVoto() {
+    const secao = this.getSecao()
+    const novaSecao = {...secao, votou: true}
+    localStorage.setItem(this.storageKey, JSON.stringify(novaSecao))
+  }
+
+  
 }
 
 export default LocalStorage;

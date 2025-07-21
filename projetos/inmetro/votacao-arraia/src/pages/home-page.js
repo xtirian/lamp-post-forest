@@ -63,7 +63,7 @@ class HomePage extends HTMLElement {
     newSesion(){
         const secao = this.geradorSecao.generateUUID();
         this.localStorage.iniciarSecao(secao)
-        return 0
+        return;
     }
 
     

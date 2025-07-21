@@ -180,7 +180,7 @@ class VotacaoPage extends HTMLElement {
             radio.addEventListener('change', (e) => {
                 if(confirm(`Seu voto será confirmado para a barraca: ${e.target.value}. Deseja confirmar?
                     `)){
-                    this._submitCadastro(e.target.value)
+                    this._submitVoto(e.target.value)
                 }
             });
         });
@@ -215,7 +215,7 @@ class VotacaoPage extends HTMLElement {
         }
     }
 
-    async _submitCadastro(voto) {
+    async _submitVoto(voto) {
         const votacaoContainer = this.shadowRoot.getElementById('votacao-container');
         const feedbackContainer = this.shadowRoot.getElementById('feedback');
         const spinner = this.shadowRoot.getElementById('spinner');
@@ -253,6 +253,8 @@ class VotacaoPage extends HTMLElement {
 
             await push(cadastroRef, novoCadastro);
 
+            this.localStorage.computarVoto();
+
             spinner.style.display = 'none';
             checkmark.style.display = 'block';
             feedbackText.textContent = 'Voto salvo com sucesso!';
@@ -270,7 +272,7 @@ class VotacaoPage extends HTMLElement {
     setButtonAction() {
         const btn = this.shadowRoot.querySelector('custom-button');
         if (btn) {
-            btn.action = () => this._submitCadastro();
+            btn.action = () => this._submitVoto();
         }
     }
 
