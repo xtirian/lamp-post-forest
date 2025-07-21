@@ -15,41 +15,28 @@ class Root extends HTMLElement {
                 .background_img{
                     position: absolute;
                 }
-                .nuvem_esquerda{
-                    top:64%;
-                    left:0;
-                    transform: translatex(-20%);
-                    animation: moverNuvemEsquerda 5s ease-in-out infinite alternate;
-                }
 
-                @keyframes moverNuvemEsquerda {
-                    0% {
-                        transform: translateX(-20%);
-                    }
-                    50% {
-                        transform: translateX(0%);
-                    }
-                    100% {
-                        transform: translateX(-20%);
-                    }
+                .navigation-root{
+                    height:100%;
                 }
+                
 
-                .nuvem_direita{
-                    top:49%;
+                .estrelas{
+                    width:110%;
+                    top:0;
                     right:0;
-                    transform: translatex(50%);
-                    animation: moverNuvemDireita 8s ease-in-out infinite alternate;
+                    animation: estrelas 30s ease-in-out infinite alternate;
                 }
 
-                @keyframes moverNuvemDireita {
+                @keyframes estrelas {
                     0% {
-                        transform: translateX(50%);
+                        transform: translateX(-10%);
                     }
                     50% {
-                        transform: translateX(30%);
+                        transform: translateY(10%);
                     }
                     100% {
-                        transform: translateX(50%);
+                        transform: translateX(-5%);
                     }
                 }
 
@@ -62,14 +49,47 @@ class Root extends HTMLElement {
                     max-width: 160%;                    
                     z-index: 999;           
                 }
+
+                .reierainha{
+                    position:absolute;                    
+                    width: 50vw;
+                    bottom: 10%;
+                    left: 8px;
+                    z-index: 9999;
+                    animation: danca 1s ease-in-out infinite alternate;
+                }
+                @keyframes danca {
+                    0%{
+                        transform:rotate(-5deg)
+                    }
+                    100%{
+                        transform: rotate(3deg)
+                    }
+                }
+
+                .lampadas{
+                    position:absolute;
+                    top:16px;
+                    width:100%;
+                }
+
+                .flag{
+                    position:absolute;
+                    top:16px;
+                    width:100%;
+                }
+
+
             </style>
         `;
 
         const template = `
-            <div class="container">
-                <img class="background_img nuvem_direita" src="./public/images/nuvem_direita.svg" alt="nuvem direita"/>
-                <img class="background_img nuvem_esquerda" src="./public/images/nuvem_esquerda.svg" alt="nuvem esquerda"/>
-                <img class="background_img base_img" src="./public/images/base.svg" alt="base"/>
+        <div class="container">        
+            <img class="background_img estrelas" src="./public/images/estrelas.png" alt="nuvem direita"/>
+            <img class="background_img flag" src="./public/images/flags.png" alt="lampadas" />
+            <img class="background_img lampadas" src="./public/images/lampadas.png" alt="lampadas" />
+            <img class="background_img reierainha" src="./public/images/rei_e_rainha.png" alt="nuvem direita"/>
+            <img class="background_img base_img" src="./public/images/base.svg" alt="base"/>
                     <div id="navigation-root">
                         <!-- ROOT NAVIGATION -->
                     </div>                    
@@ -90,17 +110,17 @@ class Root extends HTMLElement {
         }
         switch (this.step) {
         case 0:
-            component = document.createElement('splash-screen');            
+            component = document.createElement('splash-screen');
             setTimeout(() => this.nextStep(), 3000);
             break;
         case 1:
             component = document.createElement('home-page');
             break;
         case 2:
-            component = document.createElement('votacao-page');
+            component = document.createElement('votacao-rei');
             break;        
         case 3:
-            component = document.createElement('votacao-page');
+            component = document.createElement('votacao-rainha');
             break;      
         case 4:
             component = document.createElement('only-mobile');

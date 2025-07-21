@@ -55,7 +55,7 @@ class LocalStorage {
   }
   
   iniciarSecao(key) {
-    if (!!this.getSecao().secao) {
+    if (!!this.getSecao()) {
       return false; // já existe
     }
 
@@ -69,6 +69,20 @@ class LocalStorage {
     const novaSecao = {...secao, votou: true}
     localStorage.setItem(this.storageKey, JSON.stringify(novaSecao))
   }
+
+  computarVotoRei() {
+    const secao = this.getSecao()
+    const novaSecao = {...secao, rei: true}
+    localStorage.setItem(this.storageKey, JSON.stringify(novaSecao))
+  }
+
+  computarVotoRainha() {
+    const secao = this.getSecao()
+    const novaSecao = {...secao, rainha: true}
+    localStorage.setItem(this.storageKey, JSON.stringify(novaSecao))
+  }
+
+  
 
   
 }

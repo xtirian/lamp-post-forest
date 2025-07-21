@@ -14,7 +14,6 @@ class HomePage extends HTMLElement {
     connectedCallback() {
         const style = `<style>
             .home {
-                margin-top:2.5vh;
                 animation: open 2s ease-out;
             }
             .container{
@@ -22,11 +21,8 @@ class HomePage extends HTMLElement {
                 align-items: center;
                 justify-content: center;
                 flex-direction: column;
-            }
-            .img_splash{
-                height: 33vh;
-                margin-bottom:10vh;
-            }            
+                height:calc(100vh - 175px );
+            }                     
 
             @keyframes open {
                 0% {
@@ -42,8 +38,6 @@ class HomePage extends HTMLElement {
         const template = `
         <div class="home mobile-wrapper">
             <div class="container">
-                <img class="img_splash" src="./public/images/splash.svg" alt="" />
-
                 <custom-button mode='votar' />
             </div>
         </div>

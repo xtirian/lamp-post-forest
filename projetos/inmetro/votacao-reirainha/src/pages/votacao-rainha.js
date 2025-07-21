@@ -23,7 +23,8 @@ class VotacaoPage extends HTMLElement {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                flex-direction: column;                
+                flex-direction: column;
+                height:calc(100vh - 175px );
             }
 
             .img_splash{
@@ -42,13 +43,13 @@ class VotacaoPage extends HTMLElement {
                 
             .opcao-voto {
                 cursor: pointer;
-                border-radius: 10px;
                 overflow: hidden;
                 transition: border 0.2s ease;
                 width:47.5%;
                 position: relative;
             }
             .opcao-voto img {
+                border-radius: 10px;
                 width: 100%;
                 height: 100%;
                 min-height:112px;
@@ -58,7 +59,6 @@ class VotacaoPage extends HTMLElement {
             }
 
             .opcao-voto span{
-                position: absolute;
                 bottom:0;
                 left:0;
                 padding-bottom: 8px;
@@ -67,7 +67,7 @@ class VotacaoPage extends HTMLElement {
                 font-size: 1.4rem;
                 color: white;
                 font-weight: bold;
-                background-color: #42291855;
+                font-family: 'xilosa'
             }
 
             input[type="radio"]:checked + .opcao-voto span{
@@ -97,11 +97,12 @@ class VotacaoPage extends HTMLElement {
                 flex-direction:column;
                 align-items: center;
                 justify-content:center;  
-                width:100%;              
+                width:100%;     
+                color: #FFFFFF         
             }
 
             .spinner {
-                border: 8px solid #FFE6C2;
+                border: 8px solid #FFFFFF;
                 border-top: 8px solid #422918;
                 border-radius: 50%;
                 width: 40px;
@@ -116,32 +117,22 @@ class VotacaoPage extends HTMLElement {
         </style>
         `;
 
-        const regioes = [
+        const rainhas = [
             {
-                regiao: "Sul",
-                areas: ["Presi", "Ctinf", "Gabin", "Nuarp", "Cgcom", "SGQI", "Assessoria"],
+                nome: "Michelle",
+                area: "Cgcom",
                 img: "./public/images/sul.jpg"
             },
             {
-                regiao: "Sudeste",
-                areas: ["Diraf", "Dimel"],
+                nome: "Beatriz",
+                area: "Dplan",
                 img: "./public/images/sudeste.jpg"
             },
             {
-                regiao: "Centro-Oeste",
-                areas: ["Dimci", "Coger", "Audin"],
+                nome: "Luzinete",
+                area: "Dconf",
                 img: "./public/images/centrooeste.webp"
-            },
-            {
-                regiao: "Nordeste",
-                areas: ["Dplan", "Cored", "Caint"],
-                img: "./public/images/nordeste.webp"
-            },
-            {
-                regiao: "Norte",
-                areas: ["Dconf", "Cgcre"],
-                img: "./public/images/norte.jpg"
-            }
+            },            
         ];
 
         
@@ -149,15 +140,14 @@ class VotacaoPage extends HTMLElement {
         const template = `
             <div class="home mobile-wrapper">
                 <div class="container">
-                    <img class="img_splash" src="./public/images/splash.svg" alt="" />
 
                     <div class="votacao-container" id="votacao-container">
-                        ${regioes
+                        ${rainhas
                             .map(v => `
-                                <input type="radio" name="voto" id="${v.regiao}" value="${v.regiao}" />
-                                <label for="${v.regiao}" class="opcao-voto" >
-                                    <img src="${v.img}" alt="Opção ${v.regiao}" />
-                                    <span>${v.regiao}</span>
+                                <input type="radio" name="voto" id="${v.nome}" value="${v.nome}" />
+                                <label for="${v.nome}" class="opcao-voto" >
+                                    <img src="${v.img}" alt="Opção ${v.nome}" />
+                                    <span>${v.nome} - ${v.area}</span>
                                 </label>
                             `).join('')}
                     </div>
@@ -166,7 +156,7 @@ class VotacaoPage extends HTMLElement {
                     <div id="feedback" style="margin-top: 20px; gap: 8px;">
                         <div id="spinner" class="spinner"></div>
                         <img id="checkmark" src="./public/images/verifica.png" alt="Sucesso" style="display:none; width:60px; height:60px;" />
-                        <span id="feedback-text" style="font-weight:bold; color:#422918;">Enviando...</span>
+                        <span id="feedback-text" style="font-weight:bold; color:#FFFFFF;">Enviando...</span>
                     </div>
                 </div>
             </div>
@@ -178,7 +168,7 @@ class VotacaoPage extends HTMLElement {
 
         radios.forEach(radio => {
             radio.addEventListener('change', (e) => {
-                if(confirm(`Seu voto será confirmado para a barraca: ${e.target.value}. Deseja confirmar?
+                if(confirm(`Seu voto será confirmado para o Rainha: ${e.target.value}. Deseja confirmar?
                     `)){
                     this._submitVoto(e.target.value)
                 }
@@ -194,7 +184,7 @@ class VotacaoPage extends HTMLElement {
             this.nextPage(1)
         }
 
-        const votacaoSnap = await get(child(ref(database), 'votacao-barraca'));
+        const votacaoSnap = await get(child(ref(database), 'rainha'));
 
         if(!votacaoSnap.exists()) return false;
 
@@ -229,7 +219,7 @@ class VotacaoPage extends HTMLElement {
             checkmark.style.display = 'none';
             feedbackText.textContent = 'Enviando...';
 
-            const votacaoSnap = await get(child(ref(database), 'votacao-barraca'));
+            const votacaoSnap = await get(child(ref(database), 'rainha'));
 
             const votos = votacaoSnap.val();
 
@@ -249,11 +239,11 @@ class VotacaoPage extends HTMLElement {
                 voto,
             };
 
-            const cadastroRef = ref(database, 'votacao-barraca');
+            const cadastroRef = ref(database, 'rainha');
 
             await push(cadastroRef, novoCadastro);
 
-            this.localStorage.computarVoto();
+            this.localStorage.computarVotoRainha();
 
             spinner.style.display = 'none';
             checkmark.style.display = 'block';
@@ -284,4 +274,4 @@ class VotacaoPage extends HTMLElement {
     
 }
 
-customElements.define('votacao-page', VotacaoPage);
+customElements.define('votacao-rainha', VotacaoPage);
