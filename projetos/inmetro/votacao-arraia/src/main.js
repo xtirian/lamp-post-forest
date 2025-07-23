@@ -13,7 +13,7 @@ import LocalStorage from './functions/localstorage.js';
 
 const localStorage = new LocalStorage('secao').getSecao();
 
-if (localStorage.votou) {
+if (localStorage && (localStorage.votou ?? false)) {
   window.addEventListener('DOMContentLoaded', async () => {
     const modal = document.createElement('confirm-modal');
     modal.setAttribute('message', 'Você já votou. Deseja votar novamente na Barraca Mais Bonita ou no Rei e Rainha?');

@@ -55,8 +55,8 @@ class LocalStorage {
   }
   
   iniciarSecao(key) {
-    if (!!this.getSecao().secao) {
-      return false; // já existe
+    if (this.getSecao()?.secao) {
+      return false;
     }
 
     const secao = {key, votou: false}
