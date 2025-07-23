@@ -41,14 +41,15 @@ class Root extends HTMLElement {
                     }
                 }
 
-                .base_img{
-                    position:absolute;
-                    bottom:-1%;                    
-                    left:50%;
-                    transform:translatex(-50%);    
-                    min-width: 120%;     
-                    max-width: 160%;                    
-                    z-index: 999;           
+                .base_img {
+                    position: absolute;
+                    bottom: -1%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    min-width: 120%;
+                    max-width: 160%;
+                    z-index: -10;
+                    pointer-events: none; /* não vai bloquear cliques no conteúdo */
                 }
 
                 .reierainha{
@@ -56,8 +57,13 @@ class Root extends HTMLElement {
                     width: 50vw;
                     bottom: 10%;
                     left: 8px;
-                    z-index: 9999;
+                    z-index: -9;
                     animation: danca 1s ease-in-out infinite alternate;
+                }
+
+                #navigation-root {
+                    position: relative;
+                    z-index: 10; /* maior que -10 */
                 }
                 @keyframes danca {
                     0%{

@@ -143,10 +143,84 @@ class VotacaoPage extends HTMLElement {
                 100% { transform: rotate(360deg); }
             }
 
-            #avaliacao-container label {
-                color: #ffffff;
-                font-size: 1.4rem;
-            }
+            #avaliacao-container {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                margin-top: 2rem;
+                padding: 0 1rem;
+                }
+
+                #avaliacao-container label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-weight: 600;
+                font-size: 1rem;
+                gap: 12px;
+                user-select: none;
+                color:#FFFFFF;
+                font-size:2rem;
+                }
+
+                #avaliacao-container input[type="range"] {
+                -webkit-appearance: none;
+                width: 70%;
+                height: 36px;
+                background: transparent;
+                cursor: pointer;
+                touch-action: none;
+                }
+
+                #avaliacao-container input[type="range"]::-webkit-slider-runnable-track {
+                width: 100%;
+                height: 8px;
+                background: #ddd;
+                border-radius: 6px;
+                }
+
+                #avaliacao-container input[type="range"]::-moz-range-track {
+                width: 100%;
+                height: 8px;
+                background: #ddd;
+                border-radius: 6px;
+                }
+
+                #avaliacao-container input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 28px;
+                height: 28px;
+                background: #007bff;
+                border-radius: 50%;
+                cursor: pointer;
+                margin-top: -10px;
+                box-shadow: 0 0 6px rgba(0, 123, 255, 0.7);
+                transition: background 0.3s ease;
+                }
+
+                #avaliacao-container input[type="range"]::-moz-range-thumb {
+                width: 28px;
+                height: 28px;
+                background: #007bff;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 0 6px rgba(0, 123, 255, 0.7);
+                transition: background 0.3s ease;
+                }
+
+                #avaliacao-container input[type="range"]:hover::-webkit-slider-thumb,
+                #avaliacao-container input[type="range"]:focus::-webkit-slider-thumb {
+                background: #0056b3;
+                }
+
+                #avaliacao-container input[type="range"]:hover::-moz-range-thumb,
+                #avaliacao-container input[type="range"]:focus::-moz-range-thumb {
+                background: #0056b3;
+                }
+
+                
+
         </style>
         `;
 

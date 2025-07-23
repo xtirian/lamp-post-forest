@@ -41,6 +41,22 @@ class Root extends HTMLElement {
                     animation: moverNuvemDireita 8s ease-in-out infinite alternate;
                 }
 
+                .base_img {
+                    position: absolute;
+                    bottom: -1%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    min-width: 120%;
+                    max-width: 160%;
+                    z-index: -10;
+                    pointer-events: none; /* não vai bloquear cliques no conteúdo */
+                }
+
+                #navigation-root {
+                    position: relative;
+                    z-index: 10; /* maior que -10 */
+                }
+
                 @keyframes moverNuvemDireita {
                     0% {
                         transform: translateX(50%);
@@ -52,16 +68,7 @@ class Root extends HTMLElement {
                         transform: translateX(50%);
                     }
                 }
-
-                .base_img{
-                    position:absolute;
-                    bottom:-1%;                    
-                    left:50%;
-                    transform:translatex(-50%);    
-                    min-width: 120%;     
-                    max-width: 160%;                    
-                    z-index: 999;           
-                }
+                
             </style>
         `;
 
