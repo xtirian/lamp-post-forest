@@ -9,6 +9,7 @@ class VotacaoPage extends HTMLElement {
         this.step = 3; 
         this.localStorage = new LocalStorage('secao')
         this.secao = this.localStorage.getSecao();
+        this.votoEscolhido = null;
     }
 
     connectedCallback() {
@@ -36,6 +37,7 @@ class VotacaoPage extends HTMLElement {
                 display: flex;
                 flex-wrap:wrap;
                 gap: 1rem;
+                row-gap: 2rem;
                 justify-content: center;
                 align-items:center;
                 width:100%;
@@ -47,15 +49,18 @@ class VotacaoPage extends HTMLElement {
                 transition: border 0.2s ease;
                 width:47.5%;
                 position: relative;
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                overflow: visible; 
             }
             .opcao-voto img {
-                border-radius: 10px;
-                width: 100%;
-                height: 100%;
+                border-radius: 100%;
+                width: 100px;
+                height: 100px;
                 min-height:112px;
                 display: block;
                 object-fit:cover;
-                filter: grayscale(80%);
             }
 
             .opcao-voto span{
@@ -67,7 +72,17 @@ class VotacaoPage extends HTMLElement {
                 font-size: 1.4rem;
                 color: white;
                 font-weight: bold;
-                font-family: 'xilosa'
+                font-family: 'xilosa';
+                text-align:center;
+            }
+             .opcao-voto .chapeu{
+                transform: rotate(45deg);
+                width: 80%; 
+                object-fit: contain;
+                top: -40px;  
+                right: -20px;
+                z-index:9999999999;
+                position:absolute;
             }
 
             input[type="radio"]:checked + .opcao-voto span{
@@ -110,9 +125,27 @@ class VotacaoPage extends HTMLElement {
                 animation: spin 1s ease-out infinite;
             }
 
+            #btn-confirmar-voto{
+                background-color: #FFE6C2;
+                border: 2px solid #422918;
+                color: #422918;
+                border-radius: 40px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                width:300px;
+                font-size:1.8rem;
+                font-family: 'xilosa';
+            }
+
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
+            }
+
+            #avaliacao-container label {
+                color: #ffffff;
+                font-size: 1.4rem;
             }
         </style>
         `;
@@ -121,22 +154,22 @@ class VotacaoPage extends HTMLElement {
             {
                 nome: "Leandro",
                 area: "Gabin",
-                img: "./public/images/sul.jpg"
+                img: "./public/candidatos/Leandro.jpeg"
             },
             {
                 nome: "Matheus",
                 area: "Cgcom",
-                img: "./public/images/sudeste.jpg"
+                img: "./public/candidatos/Matheus.jpeg"
             },
             {
                 nome: "Renato",
                 area: "Dconf",
-                img: "./public/images/centrooeste.webp"
+                img: "./public/candidatos/Renato.jpeg"
             },    
             {
                 nome: "Francis",
                 area: "Dplan",
-                img: "./public/images/centrooeste.webp"
+                img: "./public/candidatos/Francis.png"
             },         
         ];
 
@@ -153,16 +186,28 @@ class VotacaoPage extends HTMLElement {
                                 <label for="${v.nome}" class="opcao-voto" >
                                     <img src="${v.img}" alt="Opção ${v.nome}" />
                                     <span>${v.nome} - ${v.area}</span>
+                                    <img src="./public/images/chapeu.png" alt="chapeu" class="chapeu" />
                                 </label>
                             `).join('')}
                     </div>
 
+                    
+                    <div id="avaliacao-container" style="display:none; flex-direction:column; gap:12px; margin-top: 2rem;">
+                        <label>Simpatia: <input type="range" min="1" max="5" value="3" name="simpatia" /></label>
+                        <label>Traje: <input type="range" min="1" max="5" value="3" name="traje" /></label>
+                        <label>Animação: <input type="range" min="1" max="5" value="3" name="animacao" /></label>
+                        <label>Participação: <input type="range" min="1" max="5" value="3" name="participacao" /></label>
+                        <label>Colaboração: <input type="range" min="1" max="5" value="3" name="colaboracao" /></label>
+
+                        <button id="btn-confirmar-voto">Confirmar voto</button>
+                    </div>
                     
                     <div id="feedback" style="margin-top: 20px; gap: 8px;">
                         <div id="spinner" class="spinner"></div>
                         <img id="checkmark" src="./public/images/verifica.png" alt="Sucesso" style="display:none; width:60px; height:60px;" />
                         <span id="feedback-text" style="font-weight:bold; color:#FFFFFF;">Enviando...</span>
                     </div>
+
                 </div>
             </div>
         `;
@@ -173,12 +218,30 @@ class VotacaoPage extends HTMLElement {
 
         radios.forEach(radio => {
             radio.addEventListener('change', (e) => {
-                if(confirm(`Seu voto será confirmado para o Rei: ${e.target.value}. Deseja confirmar?
-                    `)){
-                    this._submitVoto(e.target.value)
-                }
+                this.votoEscolhido = e.target.value;
+
+                // esconde o container de votação
+                this.shadowRoot.querySelector('#votacao-container').style.display = 'none';
+
+                // mostra o container de avaliação
+                this.shadowRoot.querySelector('#avaliacao-container').style.display = 'flex';
             });
+
         });
+
+        this.shadowRoot.querySelector('#btn-confirmar-voto').addEventListener('click', () => {
+            const criterios = ['simpatia', 'traje', 'animacao', 'participacao', 'colaboracao'];
+            const valores = {};
+
+            criterios.forEach(c => {
+                const input = this.shadowRoot.querySelector(`input[name="${c}"]`);
+                valores[c] = parseInt(input.value);
+            });
+
+            // envia voto e critérios
+            this._submitVoto(this.votoEscolhido, valores);
+        });
+
 
 
         this.setButtonAction()
@@ -210,18 +273,18 @@ class VotacaoPage extends HTMLElement {
         }
     }
 
-    async _submitVoto(voto) {
+    async _submitVoto(voto, criterios) {
         try {
             const votacaoSnap = await get(child(ref(database), 'rei'));
 
             const votos = votacaoSnap.val();
 
             for (const key in votos) {
-                if(Object.hasOwnProperty.call(votos, key)) {
-                    const voto = votos[key];
-                    if(this.secao.rei){
+                if (Object.hasOwnProperty.call(votos, key)) {
+                    const votoExistente = votos[key];
+                    if (this.secao.rei) {
                         this.nextPage(3);
-                        return { success: false, message: "Este usuário já votou"};
+                        return { success: false, message: "Este usuário já votou" };
                     }
                 }
             }
@@ -230,25 +293,21 @@ class VotacaoPage extends HTMLElement {
                 criadoEm: Date.now(),
                 key: this.secao.key,
                 voto,
+                criterios // aqui salva os critérios no Firebase
             };
 
             const cadastroRef = ref(database, 'rei');
-
             await push(cadastroRef, novoCadastro);
 
             this.localStorage.computarVotoRei();
-
-            this.nextPage(3)
-
+            this.nextPage(3);
             return { success: true, message: "Cadastro realizado com sucesso." };
         } catch (error) {
-            spinner.style.display = 'none';
-            checkmark.style.display = 'none';
-            feedbackText.textContent = 'Erro ao realizar cadastro.';
             console.error("Erro ao submeter cadastro:", error);
             return { success: false, message: "Erro ao realizar cadastro." };
         }
     }
+
 
     setButtonAction() {
         const btn = this.shadowRoot.querySelector('custom-button');

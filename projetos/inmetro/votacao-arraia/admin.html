@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resultados da Votação</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 1rem;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.6rem;
+      color: #422918;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      text-align: center;
+      color: #8B4513;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .campeao {
+      background: linear-gradient(90deg, #fcd9a4 0%, #422918 100%);
+      color: #422918;
+      font-weight: bold;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      margin-bottom: 2rem;
+      font-size: 1.4rem;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .resultado-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .candidato, .barraca {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #422918;
+      margin-bottom: 0.8rem;
+      text-align: center;
+    }
+
+    .criterio {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+      margin: 2px 0;
+    }
+
+    .media-geral {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #8B4513;
+      text-align: center;
+    }
+
+    .score {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+      font-style: italic;
+    }
+
+    @media (min-width: 600px) {
+      body {
+        max-width: 500px;
+        margin: auto;
+      }
+    }
+  </style>
+
+  <script type="module">
+    import { database } from './src/firebaseConfig.js';
+    import { ref, get, child } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+    async function fetchVotos(caminho) {
+      const snap = await get(child(ref(database), caminho));
+      if (!snap.exists()) return [];
+      return Object.values(snap.val());
+    }
+
+    // Função para contar votos simples para barracas
+    function contarVotosBarraca(votos) {
+      const contagem = {};
+      votos.forEach(voto => {
+        const nome = voto.voto;
+        if (!contagem[nome]) contagem[nome] = 0;
+        contagem[nome]++;
+      });
+      // Ordena decrescente
+      return Object.entries(contagem)
+        .map(([nome, qtd]) => ({ nome, votosRecebidos: qtd }))
+        .sort((a, b) => b.votosRecebidos - a.votosRecebidos);
+    }
+
+    // Calcula média dos critérios para cada candidato
+    function calcularMedia(votos) {
+      const notasPorCandidato = {};
+
+      votos.forEach(voto => {
+        const nome = voto.voto;
+        const criterios = voto.criterios;
+        if (!criterios) return;
+
+        if (!notasPorCandidato[nome]) {
+          notasPorCandidato[nome] = {
+            total: { simpatia: 0, traje: 0, animacao: 0, participacao: 0, colaboracao: 0 },
+            count: 0
+          };
+        }
+
+        for (const crit in criterios) {
+          notasPorCandidato[nome].total[crit] += criterios[crit];
+        }
+        notasPorCandidato[nome].count++;
+      });
+
+      return Object.entries(notasPorCandidato).map(([nome, data]) => {
+        const c = data.count;
+        const t = data.total;
+        const medias = {
+          simpatia: (t.simpatia / c).toFixed(1),
+          traje: (t.traje / c).toFixed(1),
+          animacao: (t.animacao / c).toFixed(1),
+          participacao: (t.participacao / c).toFixed(1),
+          colaboracao: (t.colaboracao / c).toFixed(1),
+        };
+        const mediaGeral = (
+          (parseFloat(medias.simpatia) +
+          parseFloat(medias.traje) +
+          parseFloat(medias.animacao) +
+          parseFloat(medias.participacao) +
+          parseFloat(medias.colaboracao)) / 5
+        ).toFixed(1);
+
+        return { nome, ...medias, mediaGeral };
+      });
+    }
+
+    // Conta quantidade de votos recebidos por candidato
+    function countVotosPorNome(votos) {
+      const contagem = {};
+      votos.forEach(v => {
+        const nome = v.voto;
+        if (!contagem[nome]) contagem[nome] = 0;
+        contagem[nome]++;
+      });
+      return contagem;
+    }
+
+    // Calcula score ponderado e ordena decrescente
+    function calcularComScore(votos, pesoCriterio = 1, pesoVoto = 5) {
+      const votosPorNome = countVotosPorNome(votos);
+      const criteriosPorNome = calcularMedia(votos);
+
+      return criteriosPorNome.map(candidato => {
+        const votosRecebidos = votosPorNome[candidato.nome] || 0;
+        const mediaCriterios = parseFloat(candidato.mediaGeral);
+        const score = (mediaCriterios * pesoCriterio) + (votosRecebidos * pesoVoto);
+
+        return { ...candidato, votosRecebidos, score: score.toFixed(2) };
+      }).sort((a, b) => b.score - a.score);
+    }
+
+    // Renderiza os cards dos resultados
+    function renderCards(titulo, resultados, tipo = "candidato") {
+      const container = document.createElement("div");
+      container.innerHTML = `<h1>${titulo}</h1>`;
+
+      // Destaque do campeão (primeiro lugar)
+      if(resultados.length > 0){
+        const campeao = resultados[0];
+        container.innerHTML += `
+          <div class="campeao">
+            🏆 Primeiro lugar: <strong>${campeao.nome}</strong><br/>
+            ${tipo === "barraca" ? `
+              Votos recebidos: ${campeao.votosRecebidos}
+            ` : `
+              Média dos critérios: ${campeao.mediaGeral} <br/>
+              Votos recebidos: ${campeao.votosRecebidos} <br/>
+              <em>Score total: ${campeao.score}</em>
+            `}
+          </div>
+        `;
+      }
+
+      resultados.forEach(r => {
+        container.innerHTML += `
+          <div class="resultado-card">
+            <div class="${tipo}">${r.nome}</div>
+            ${tipo === "barraca" ? `
+              <div class="score">Votos recebidos: ${r.votosRecebidos}</div>
+            ` : `
+              <div class="criterio"><span>Simpatia</span><span>${r.simpatia}</span></div>
+              <div class="criterio"><span>Traje</span><span>${r.traje}</span></div>
+              <div class="criterio"><span>Animação</span><span>${r.animacao}</span></div>
+              <div class="criterio"><span>Participação</span><span>${r.participacao}</span></div>
+              <div class="criterio"><span>Colaboração</span><span>${r.colaboracao}</span></div>
+              <div class="media-geral">Média Geral: ${r.mediaGeral}</div>
+              <div class="score">Score total: ${r.score}</div>
+              <div class="score">Votos recebidos: ${r.votosRecebidos}</div>
+            `}
+          </div>
+        `;
+      });
+      document.body.appendChild(container);
+    }
+
+    (async () => {
+      // Barracas
+      const votosBarraca = await fetchVotos('votacao-barraca');
+      const resultadosBarraca = contarVotosBarraca(votosBarraca);
+
+      // Rainha
+      const votosRainha = await fetchVotos('rainha');
+      const resultadosRainha = calcularComScore(votosRainha);
+
+      // Rei
+      const votosRei = await fetchVotos('rei');
+      const resultadosRei = calcularComScore(votosRei);
+
+      renderCards("Resultado - Barracas", resultadosBarraca, "barraca");
+      renderCards("Resultado - Rainha", resultadosRainha);
+      renderCards("Resultado - Rei", resultadosRei);
+    })();
+  </script>
+</head>
+<body>
+</body>
+</html>
