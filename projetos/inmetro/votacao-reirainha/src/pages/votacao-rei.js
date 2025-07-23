@@ -169,7 +169,7 @@ class VotacaoPage extends HTMLElement {
             {
                 nome: "Francis",
                 area: "Dplan",
-                img: "./public/candidatos/francis.png"
+                img: "./public/candidatos/Francis.png"
             },         
         ];
 
