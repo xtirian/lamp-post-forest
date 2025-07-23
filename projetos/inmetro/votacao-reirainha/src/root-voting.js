@@ -26,6 +26,7 @@ class Root extends HTMLElement {
                     top:0;
                     right:0;
                     animation: estrelas 30s ease-in-out infinite alternate;
+                    z-index: -1;
                 }
 
                 @keyframes estrelas {
@@ -69,8 +70,10 @@ class Root extends HTMLElement {
 
                 .lampadas{
                     position:absolute;
-                    top:16px;
+                    top:0;
                     width:100%;
+                    height:200px;
+                    object-fit: cover;
                 }
 
                 .flag{
